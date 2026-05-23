@@ -98,6 +98,21 @@ public class Color {
 	public static Color okhcl(Vec3 v) {
 		return okhcl(v.x(), v.y(), v.z());
 	}
+
+
+	public Vec3 okhcl() {
+		double l_ = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+		double m_ = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+		double s_ = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+
+		double l =  0.2104542553 * l_ + 0.7936177850 * m_ - 0.0040720468 * s_;
+		double a =  1.9779984951 * l_ - 2.4285922050 * m_ + 0.4505937099 * s_;
+		double bo = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.8086757660 * s_;
+
+		double c = Math.sqrt(a * a + bo * bo);
+		double h = Numeric.mod(Math.atan2(bo, a) / (2.0 * Math.PI));
+		return Vec3.xyz(h, c, l);
+	}
 	
 	
 	public static Color code(int code) {
@@ -202,8 +217,13 @@ public class Color {
 		
 		return Vec3.xyz(hue, saturation, brightness);
 	}
-	
-	
+
+
+	public Vec3 rgb() {
+		return Vec3.xyz(r, g, b);
+	}
+
+
 	public double max() {
 		return Math.max(r, Math.max(g, b));
 	}
