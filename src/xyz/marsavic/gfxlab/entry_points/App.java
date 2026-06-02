@@ -118,7 +118,7 @@ public class App extends Application {
 		
 		textArea.setMouseTransparent(true);
 		
-		Vector sceneSize = UtilsFX.getScreenBox().x().d() < 2400 ? Vector.xy(1840, 1000) : Vector.xy(2400, 1200);
+		Vector sceneSize = UtilsFX.getScreenBox().d().mul(0.9);
 		Scene scene = new Scene(root, sceneSize.x(), sceneSize.y());
 		
 		

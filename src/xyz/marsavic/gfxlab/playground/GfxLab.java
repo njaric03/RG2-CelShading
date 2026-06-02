@@ -33,8 +33,11 @@ public class GfxLab {
 //				Oranges2
 //				CityOfNight
 		
-				SDFTest
+//				SDFTest
+
+				SceneCelDemo
 		.setup();
+
 	}
 	
 }
