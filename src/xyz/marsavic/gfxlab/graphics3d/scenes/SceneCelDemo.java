@@ -73,7 +73,10 @@ public record SceneCelDemo() implements FFSceneT {
 
 	public static ElementF<Animation> setup() {
 		var sceneNode = e(SceneCelDemo.class);
-		ElementF<Vec3> sizeHi = e(xyz(1, 1280, 1280));
+
+		var supersample = e(2);
+		var sizeOut = e(xyz(1, 640, 640));
+		var sizeHi = e((Vec3 so, Integer s) -> xyz(so.x(), so.y() * s, so.z() * s), sizeOut, supersample);
 
 		return e(CelShader3.class,
 				new EAggregator(
@@ -96,7 +99,7 @@ public record SceneCelDemo() implements FFSceneT {
 						sizeHi
 				),
 				e(AutoSoft.class, e(0x1p-4), e(1.0)),
-				e(2),    // supersample
+				supersample,    // supersample
 				e(4),    // lightnessBands
 				e(3),    // chromaBands
 				e(12),   // hueBands
