@@ -19,7 +19,9 @@ public class RayTracerNormal extends RayTracer {
 	@Override
 	protected Color sample(Scene scene, Ray ray) {
 		Hit hit = scene.solid().firstHit(ray, EPSILON);
+		// promašaj: normala je (0,0,0)
 		Vec3 n = (hit.t() == Double.POSITIVE_INFINITY) ? Vec3.ZERO : hit.n_();
+		// (n+1)/2 mapira komponente iz [-1,1] u [0,1]; promašaj tako ispadne siv (0.5, 0.5, 0.5)
 		return Color.rgb((n.x() + 1) * 0.5, (n.y() + 1) * 0.5, (n.z() + 1) * 0.5);
 	}
 

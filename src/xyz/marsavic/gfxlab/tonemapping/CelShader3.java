@@ -71,6 +71,7 @@ public record CelShader3(
 
 		Rr<Matrix<Integer>> rOut = UtilsGL.matricesInt.obtain(sizeOut, true);
 		final double invSamples = 1.0 / (s * s);
+		// po izlaznom pikselu usrednjava s*s hi-res uzoraka (supersampling) za anti-aliasing
 		rOut.a(mOut -> mOut.fill((x, y) -> {
 			Color sum = Color.BLACK;
 			int xHi = x * s, yHi = y * s;
@@ -87,23 +88,29 @@ public record CelShader3(
 	private Color shadeSample(Matrix<Color> mColor, Matrix<Color> mNormal, Matrix<Color> mDepth, ColorTransform tone, int x, int y, int step) {
 		Color banded = quantize(tone.at(mColor.at(x, y)));
 
+		// depthEdgeScale pojačava depth ivice (posle /farPlane su male), pa siluete dobijaju prioritet nad pregibima
 		double e = Math.max(normalEdge(mNormal, x, y, step), depthEdge(mDepth, x, y, step) * depthEdgeScale);
+		// smoothstep omekšava ivicu da ne bude nazubljena
 		double outlineWeight = smoothstep(0.5 * edgeThreshold, 1.5 * edgeThreshold, e);
 
+		// na punoj ivici boja ide u crno, na delimičnoj samo potamni
 		return banded.mul(1.0 - outlineWeight);
 	}
 
 	private Color quantize(Color color) {
 		Vec3 hcl = color.okhcl();
 		double ql = bandify(hcl.z(), lightnessBands);
+		// ispod ACHROMATIC_EPS je hue samo šum (atan2 od argumenata blizu nule), pa se kvantizuje samo lightness i piksel ostaje siv
 		if (hcl.y() < ACHROMATIC_EPS)
 			return Color.okhcl(0, 0, ql).clampTo01();
 		double qh = bandify(hcl.x(), hueBands);
+		// chroma nema prirodnu gornju granicu (za razliku od L i hue), pa se skalira u [0,1] preko OKHCL_CHROMA_NORM
 		double qc = bandify(hcl.y() / OKHCL_CHROMA_NORM, chromaBands) * OKHCL_CHROMA_NORM;
 		return Color.okhcl(qh, qc, ql).clampTo01();
 	}
 
 	private static double bandify(double v, int n) {
+		// zaokrugli v na centar trake; ceo opseg trake pada na istu vrednost, odatle ravne cel površine
 		int band = (int) Math.floor(v * n);
 		if (band < 0) band = 0;
 		if (band >= n) band = n - 1;
@@ -118,6 +125,7 @@ public record CelShader3(
 
 
 	private static double normalEdge(Matrix<Color> mSrc, int x, int y, int step) {
+		// gradijent normale, hvata pregibe unutar objekta gde se površina savija
 		double gr = edgeStrength(mSrc, x, y, 0, step);
 		double gg = edgeStrength(mSrc, x, y, 1, step);
 		double gb = edgeStrength(mSrc, x, y, 2, step);
@@ -125,6 +133,7 @@ public record CelShader3(
 	}
 
 	private static double depthEdge(Matrix<Color> mSrc, int x, int y, int step) {
+		// gradijent dubine, hvata siluete i mesta gde jedan objekat zaklanja drugi
 		return edgeStrength(mSrc, x, y, 0, step);
 	}
 

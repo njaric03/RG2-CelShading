@@ -21,6 +21,7 @@ public class RayTracerDepth extends RayTracer {
 	protected Color sample(Scene scene, Ray ray) {
 		Hit hit = scene.solid().firstHit(ray, EPSILON);
 		double t = hit.t();
+		// promašaj je 1.0 (far plane), inače min(t/farPlane, 1)
 		double d = (t == Double.POSITIVE_INFINITY) ? 1.0 : Math.min(t / farPlane, 1.0);
 		return Color.gray(d);
 	}
