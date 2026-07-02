@@ -94,7 +94,7 @@ public record SceneCelDemo() implements FFSceneT {
 						sizeHi
 				),
 				new RenderOnce(
-						e(RayTracerDepth.class, sceneNode, e(15.0)),
+						e(RayTracerDepth.class, sceneNode, e(30.0)),
 						e(TransformationFromSize.ToGeometricT0_.class),
 						sizeHi
 				),

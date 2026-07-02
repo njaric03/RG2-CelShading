@@ -33,6 +33,7 @@ public record CelShader3(
 
 
 	private static final double OKHCL_CHROMA_NORM = 0.4;
+	private static final double ACHROMATIC_EPS = 0.002;
 
 	private static final double[][] SOBEL_X = {
 			{-1, 0, 1},
@@ -94,9 +95,11 @@ public record CelShader3(
 
 	private Color quantize(Color color) {
 		Vec3 hcl = color.okhcl();
+		double ql = bandify(hcl.z(), lightnessBands);
+		if (hcl.y() < ACHROMATIC_EPS)
+			return Color.okhcl(0, 0, ql).clampTo01();
 		double qh = bandify(hcl.x(), hueBands);
 		double qc = bandify(hcl.y() / OKHCL_CHROMA_NORM, chromaBands) * OKHCL_CHROMA_NORM;
-		double ql = bandify(hcl.z(), lightnessBands);
 		return Color.okhcl(qh, qc, ql).clampTo01();
 	}
 

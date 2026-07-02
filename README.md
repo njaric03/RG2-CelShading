@@ -49,8 +49,8 @@ Shader prima tri prolaza:
    nje se hvataju pregibi unutar istog objekta, tamo gde se površina savija, a silueta
    ostaje ista.
 3. **Depth**: [RayTracerDepth](src/xyz/marsavic/gfxlab/graphics3d/raytracers/RayTracerDepth.java)
-   kroz RenderOnce. Prvi hit, rastojanje do tačke skalirano u `[0,1]`. Iz njega se
-   hvataju siluete i mesta gde jedan objekat zaklanja drugi.
+   kroz RenderOnce. Prvi hit, dubina duž pravca gledanja skalirana u `[0,1]` deljenjem
+   sa `farPlane`. Iz nje se hvataju siluete i mesta gde jedan objekat zaklanja drugi.
 
 U agregatoru ima smisla usrednjavati samo boju. Za normale i dubinu nam
 treba stanje površine tačno u centru piksela, pa za njih ide zaseban
@@ -75,6 +75,11 @@ granice traka raspoređene bliže tome kako ih ljudsko oko vidi. Sve tri kompone
 (lightness, chroma, hue) se kvantizuju isto: `bandify` zaokruži vrednost na centar
 njene trake (`floor(v*n)`, clampovano, pa `(band+0.5)/n`). U demou ih je 4 za
 lightness, 3 za chroma i 12 za hue.
+
+Izuzetak su zaista ahromatske boje (chroma ispod `ACHROMATIC_EPS`): tu je hue samo
+numerički šum (atan2 vrednosti blizu nule), pa bi mapiranje na centar trake dodalo
+nasumičan ton. Zato se hue i chroma postave na 0 (piksel ostaje siv), a kvantizuje se
+samo lightness.
 
 Chroma je jedina komponenta bez prirodne gornje granice. Lightness ide od 0 (crna)
 do 1 (bela), a hue je ugao normalizovan na `[0,1]` (turnova); chroma zavisi od boje i za sve
